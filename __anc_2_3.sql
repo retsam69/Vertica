@@ -1,0 +1,62 @@
+DROP TABLE st4hdc.ANC;
+
+CREATE TABLE st4hdc.ANC
+(
+    HOSPCODE varchar(5) NOT NULL,
+    PID varchar(15) NOT NULL,
+    SEQ varchar(16),
+    DATE_SERV date NOT NULL,
+    GRAVIDA varchar(2) NOT NULL,
+    ANCNO varchar(1),
+    GA varchar(2) NOT NULL,
+    ANCRESULT varchar(1) NOT NULL,
+    ANCPLACE varchar(5),
+    PROVIDER varchar(15),
+    D_UPDATE timestamp NOT NULL,
+    CID varchar(13),
+    HDC_DATE timestamp,
+    SOURCE_DATA varchar(6)
+);
+
+ALTER TABLE st4hdc.ANC ADD CONSTRAINT ANC_PK PRIMARY KEY (HOSPCODE, PID, DATE_SERV) ENABLED;
+
+
+CREATE PROJECTION st4hdc.ANC /*+createtype(A)*/ 
+(
+ HOSPCODE,
+ PID,
+ SEQ,
+ DATE_SERV,
+ GRAVIDA,
+ ANCNO,
+ GA,
+ ANCRESULT,
+ ANCPLACE,
+ PROVIDER,
+ D_UPDATE,
+ CID,
+ HDC_DATE,
+ SOURCE_DATA
+)
+AS
+ SELECT ANC.HOSPCODE,
+        ANC.PID,
+        ANC.SEQ,
+        ANC.DATE_SERV,
+        ANC.GRAVIDA,
+        ANC.ANCNO,
+        ANC.GA,
+        ANC.ANCRESULT,
+        ANC.ANCPLACE,
+        ANC.PROVIDER,
+        ANC.D_UPDATE,
+        ANC.CID,
+        ANC.HDC_DATE,
+        ANC.SOURCE_DATA
+ FROM st4hdc.ANC
+ ORDER BY ANC.HOSPCODE,
+          ANC.PID,
+          ANC.DATE_SERV
+SEGMENTED BY hash(ANC.HOSPCODE, ANC.PID, ANC.DATE_SERV) ALL NODES KSAFE 1;
+
+--SELECT MARK_DESIGN_KSAFE(1);

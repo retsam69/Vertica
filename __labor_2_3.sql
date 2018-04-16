@@ -1,0 +1,71 @@
+DROP TABLE st4hdc.LABOR;
+
+CREATE TABLE st4hdc.LABOR
+(
+    HOSPCODE varchar(5) NOT NULL,
+    PID varchar(15) NOT NULL,
+    GRAVIDA varchar(2) NOT NULL,
+    LMP date NOT NULL,
+    EDC date,
+    BDATE date NOT NULL,
+    BRESULT varchar(6) NOT NULL,
+    BPLACE char(1) NOT NULL,
+    BHOSP varchar(5),
+    BTYPE char(1) NOT NULL,
+    BDOCTOR char(1) NOT NULL,
+    LBORN numeric(1,0) NOT NULL,
+    SBORN numeric(1,0) NOT NULL,
+    D_UPDATE timestamp NOT NULL,
+    CID varchar(13),
+    HDC_DATE timestamp,
+    SOURCE_DATA varchar(6)
+);
+
+ALTER TABLE st4hdc.LABOR ADD CONSTRAINT LABOR_PK PRIMARY KEY (HOSPCODE, PID, GRAVIDA, BDATE) ENABLED;
+
+CREATE PROJECTION st4hdc.LABOR /*+createtype(A)*/ 
+(
+ HOSPCODE,
+ PID,
+ GRAVIDA,
+ LMP,
+ EDC,
+ BDATE,
+ BRESULT,
+ BPLACE,
+ BHOSP,
+ BTYPE,
+ BDOCTOR,
+ LBORN,
+ SBORN,
+ D_UPDATE,
+ CID,
+ HDC_DATE,
+ SOURCE_DATA
+)
+AS
+ SELECT LABOR.HOSPCODE,
+        LABOR.PID,
+        LABOR.GRAVIDA,
+        LABOR.LMP,
+        LABOR.EDC,
+        LABOR.BDATE,
+        LABOR.BRESULT,
+        LABOR.BPLACE,
+        LABOR.BHOSP,
+        LABOR.BTYPE,
+        LABOR.BDOCTOR,
+        LABOR.LBORN,
+        LABOR.SBORN,
+        LABOR.D_UPDATE,
+        LABOR.CID,
+        LABOR.HDC_DATE,
+        LABOR.SOURCE_DATA
+ FROM st4hdc.LABOR
+ ORDER BY LABOR.HOSPCODE,
+          LABOR.PID,
+          LABOR.GRAVIDA,
+          LABOR.BDATE
+SEGMENTED BY hash(LABOR.HOSPCODE, LABOR.PID, LABOR.GRAVIDA, LABOR.BDATE) ALL NODES KSAFE 1;
+
+--SELECT MARK_DESIGN_KSAFE(1);

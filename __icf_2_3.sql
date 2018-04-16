@@ -1,0 +1,56 @@
+DROP TABLE st4hdc.ICF;
+
+CREATE TABLE st4hdc.ICF
+(
+    HOSPCODE varchar(5) NOT NULL,
+    DISABID varchar(13),
+    PID varchar(15) NOT NULL,
+    SEQ varchar(16) NOT NULL,
+    DATE_SERV date NOT NULL,
+    ICF varchar(6) NOT NULL,
+    QUALIFIER char(1),
+    PROVIDER varchar(15),
+    D_UPDATE timestamp NOT NULL,
+    CID varchar(13),
+    HDC_DATE timestamp,
+    SOURCE_DATA varchar(6)
+);
+
+ALTER TABLE st4hdc.ICF ADD CONSTRAINT ICF_PK PRIMARY KEY (HOSPCODE, PID, SEQ, ICF) ENABLED;
+
+CREATE PROJECTION st4hdc.ICF /*+createtype(A)*/ 
+(
+ HOSPCODE,
+ DISABID,
+ PID,
+ SEQ,
+ DATE_SERV,
+ ICF,
+ QUALIFIER,
+ PROVIDER,
+ D_UPDATE,
+ CID,
+ HDC_DATE,
+ SOURCE_DATA
+)
+AS
+ SELECT ICF.HOSPCODE,
+        ICF.DISABID,
+        ICF.PID,
+        ICF.SEQ,
+        ICF.DATE_SERV,
+        ICF.ICF,
+        ICF.QUALIFIER,
+        ICF.PROVIDER,
+        ICF.D_UPDATE,
+        ICF.CID,
+        ICF.HDC_DATE,
+        ICF.SOURCE_DATA
+ FROM st4hdc.ICF
+ ORDER BY ICF.HOSPCODE,
+          ICF.PID,
+          ICF.SEQ,
+          ICF.ICF
+SEGMENTED BY hash(ICF.HOSPCODE, ICF.PID, ICF.SEQ, ICF.ICF) ALL NODES KSAFE 1;
+
+--SELECT MARK_DESIGN_KSAFE(1);

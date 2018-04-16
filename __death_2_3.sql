@@ -1,0 +1,75 @@
+DROP TABLE st4hdc.DEATH;
+
+CREATE TABLE st4hdc.DEATH
+(
+    HOSPCODE varchar(5) NOT NULL,
+    PID varchar(15) NOT NULL,
+    HOSPDEATH varchar(5),
+    AN varchar(9),
+    SEQ varchar(16),
+    DDEATH date NOT NULL,
+    CDEATH_A varchar(6) NOT NULL,
+    CDEATH_B varchar(6),
+    CDEATH_C varchar(6),
+    CDEATH_D varchar(6),
+    ODISEASE varchar(6),
+    CDEATH varchar(6) NOT NULL,
+    PREGDEATH varchar(1),
+    PDEATH varchar(1) NOT NULL,
+    PROVIDER varchar(15),
+    D_UPDATE timestamp NOT NULL,
+    CID varchar(13),
+    HDC_DATE timestamp,
+    SOURCE_DATA varchar(6)
+);
+
+ALTER TABLE st4hdc.DEATH ADD CONSTRAINT DEATH_PK PRIMARY KEY (HOSPCODE, PID) ENABLED;
+
+CREATE PROJECTION st4hdc.DEATH /*+createtype(L)*/ 
+(
+ HOSPCODE,
+ PID,
+ HOSPDEATH,
+ AN,
+ SEQ,
+ DDEATH,
+ CDEATH_A,
+ CDEATH_B,
+ CDEATH_C,
+ CDEATH_D,
+ ODISEASE,
+ CDEATH,
+ PREGDEATH,
+ PDEATH,
+ PROVIDER,
+ D_UPDATE,
+ CID,
+ HDC_DATE,
+ SOURCE_DATA
+)
+AS
+ SELECT DEATH.HOSPCODE,
+        DEATH.PID,
+        DEATH.HOSPDEATH,
+        DEATH.AN,
+        DEATH.SEQ,
+        DEATH.DDEATH,
+        DEATH.CDEATH_A,
+        DEATH.CDEATH_B,
+        DEATH.CDEATH_C,
+        DEATH.CDEATH_D,
+        DEATH.ODISEASE,
+        DEATH.CDEATH,
+        DEATH.PREGDEATH,
+        DEATH.PDEATH,
+        DEATH.PROVIDER,
+        DEATH.D_UPDATE,
+        DEATH.CID,
+        DEATH.HDC_DATE,
+        DEATH.SOURCE_DATA
+ FROM st4hdc.DEATH
+ ORDER BY DEATH.HOSPCODE,
+          DEATH.PID
+SEGMENTED BY hash(DEATH.HOSPCODE, DEATH.PID) ALL NODES KSAFE 1;
+
+--SELECT MARK_DESIGN_KSAFE(1);
